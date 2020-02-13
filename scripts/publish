@@ -8,7 +8,7 @@ CLI_RESET="\033[0m"
 
 read -p "Enter a new version (current: $(node -p 'require("./package.json").version')): " new_version
 
-npm test
+#npm test
 
 if [ -n "$new_version" ]
 then
