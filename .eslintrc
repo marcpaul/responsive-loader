@@ -1,0 +1,16 @@
+{
+  "extends": ["prettier", "react-app"],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "worker": true,
+    "jest": true,
+    "mocha": true,
+    "serviceworker": true
+  },
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-unused-vars": "error"
+  }
+}
