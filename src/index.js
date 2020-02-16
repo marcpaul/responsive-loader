@@ -19,7 +19,6 @@ type Config = {
   sizes: [string | number] | void,
   min: string | number | void,
   max: string | number | void,
-  dpi: [number],
   steps: string | number | void,
   name: string | void,
   outputPath: Function | string | void,
@@ -112,7 +111,7 @@ module.exports = function loader(content: Buffer) {
   const max: number | void = config.max !== undefined ? parseInt(config.max, 10) : undefined
   const steps: number = config.steps === undefined ? 4 : parseInt(config.steps, 10)
 
-  let generatedSizes = []
+  let generatedSizes
   if (typeof min === 'number' && max) {
     generatedSizes = []
 
@@ -120,15 +119,6 @@ module.exports = function loader(content: Buffer) {
       const size = min + ((max - min) / (steps - 1)) * step
       generatedSizes.push(Math.ceil(size))
     }
-  }
-
-  if (config.dpi && config.sizes) {
-    config.sizes.forEach(size => {
-      generatedSizes.push(size)
-      config.dpi.forEach(value => {
-        generatedSizes.push(parseInt(size, 10) * value)
-      })
-    })
   }
 
   const sizes = parsedResourceQuery.size ||
@@ -182,23 +172,8 @@ module.exports = function loader(content: Buffer) {
 
     loaderContext.emitFile(outputPath, data)
 
-    let retina = null
-
-    if (config.dpi) {
-      const sizes = config.sizes || []
-      const dpi = config.dpi || []
-      if (!sizes.includes(width)) {
-        dpi.forEach(value => {
-          sizes.forEach(size => {
-            if (width / parseInt(size, 10) === value)
-              retina = publicPath + `+${JSON.stringify(` ${size}w ${value}x`)}`
-          })
-        })
-      }
-    }
-
     return {
-      src: retina ? retina : publicPath + `+${JSON.stringify(` ${width}w`)}`,
+      src: publicPath + `+${JSON.stringify(` ${width}w`)}`,
       path: publicPath,
       width: width,
       height: height,
@@ -232,6 +207,7 @@ module.exports = function loader(content: Buffer) {
           )
         }
       })
+
       if (outputPlaceholder) {
         promises.push(
           img.resize({
